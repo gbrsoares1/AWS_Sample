@@ -39,7 +39,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_SERVER ./Code/server
+          docker build -t ${ECR_SERVER}:${IMAGE_TAG} ./Code/server
 
           docker tag \
             $ECR_SERVER:$IMAGE_TAG \
@@ -54,7 +54,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_CLIENT ./Code/client
+          docker build -t ${ECR_CLIENT}:${IMAGE_TAG} ./Code/client
 
           docker tag \
             $ECR_CLIENT:$IMAGE_TAG \
