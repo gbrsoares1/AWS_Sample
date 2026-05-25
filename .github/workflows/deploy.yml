@@ -1,0 +1,63 @@
+name: Build and Deploy ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-east-1
+      ECR_SERVER: repo-server
+      ECR_CLIENT: repo-client
+      ECS_CLUSTER: Cluster-AWS-Sample
+      ECS_SERVICE_SERVER: Service-AWS-Sample-server
+      ECS_SERVICE_CLIENT: Service-AWS-Sample-client
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push Server
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_SERVER ./Code/server
+          docker tag $ECR_SERVER:latest $ECR_REGISTRY/$ECR_SERVER:latest
+          docker push $ECR_REGISTRY/$ECR_SERVER:latest
+
+      - name: Build and Push Client
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_CLIENT ./Code/client
+          docker tag $ECR_CLIENT:latest $ECR_REGISTRY/$ECR_CLIENT:latest
+          docker push $ECR_REGISTRY/$ECR_CLIENT:latest
+
+      - name: Deploy Server
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE_SERVER \
+            --force-new-deployment
+
+      - name: Deploy Client
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE_CLIENT \
+            --force-new-deployment
