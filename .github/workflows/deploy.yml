@@ -42,12 +42,12 @@ jobs:
           docker build -t ${ECR_SERVER}:${IMAGE_TAG} ./Code/server
 
           docker tag \
-            $ECR_SERVER:$IMAGE_TAG \
-            $ECR_REGISTRY/$ECR_SERVER:$IMAGE_TAG
+            ${ECR_SERVER}:${IMAGE_TAG} \
+            ${ECR_REGISTRY}/${ECR_SERVER}:${IMAGE_TAG}
 
 
           docker push \
-            $ECR_REGISTRY/$ECR_SERVER:$IMAGE_TAG
+            ${ECR_REGISTRY}/${ECR_SERVER}:${IMAGE_TAG}
 
       - name: Build and Push Client
         env:
@@ -57,12 +57,12 @@ jobs:
           docker build -t ${ECR_CLIENT}:${IMAGE_TAG} ./Code/client
 
           docker tag \
-            $ECR_CLIENT:$IMAGE_TAG \
-            $ECR_REGISTRY/$ECR_SERVER:$IMAGE_TAG
+            ${ECR_CLIENT}:${IMAGE_TAG} \
+            ${ECR_REGISTRY}/${ECR_CLIENT}:${IMAGE_TAG}
 
 
           docker push \
-            $ECR_REGISTRY/$ECR_CLIENT:$IMAGE_TAG
+            ${ECR_REGISTRY}/${ECR_CLIENT}:${IMAGE_TAG}
 
       - name: Deploy Server
         run: |
