@@ -25,7 +25,7 @@
         </button>
       </form>
       <br>
-      <h5>*No auth was implemented, just a Vue.js demo component teste CI/CD </h5>
+      <h5>*No auth was implemented, just a Vue.js demo component</h5>
     </div>
   </div>
 </template>
